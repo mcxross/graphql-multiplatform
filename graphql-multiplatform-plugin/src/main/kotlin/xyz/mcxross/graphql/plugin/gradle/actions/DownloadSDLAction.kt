@@ -34,6 +34,6 @@ abstract class DownloadSDLAction : WorkAction<RetrieveSchemaParameters> {
         val schemaFile = parameters.schemaFile.get()
 
         val schema = downloadSchema(endpoint, headers, timeout.connect, timeout.read)
-        schemaFile.writeText(schema.toString())
+        schemaFile.writeText(schema)
     }
 }

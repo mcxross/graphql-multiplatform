@@ -16,12 +16,21 @@
 
 package xyz.mcxross.graphql.client
 
+import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.js.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
 /**
- * The default JS engine for the client.
+ * Default HTTP client for Js platform. Uses Js as the underlying HTTP client
+ * implementation.
  */
-
-actual val defaultEngine: HttpClientEngine
-    get() = Js.create()
+actual fun httpClient(
+  engine: HttpClientEngine?,
+) =
+  HttpClient(Js) {
+    // Set the content negotiation. This is required for the client to know how to handle JSON.
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+  }

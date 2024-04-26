@@ -25,7 +25,6 @@ interface GraphQLClient<RequestCustomizer> {
     request: GraphQLClientRequest<T>,
     requestCustomizer: RequestCustomizer.() -> Unit = {},
   ): GraphQLClientResponse<T>
-
   /**
    * Executes batch requests that contains a number of [GraphQLClientRequest]s and returns a list of
    * corresponding [GraphQLClientResponse]s.

@@ -47,7 +47,7 @@ import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.MissingType
 
 private val logger: Logger =
   LoggerFactory.getLogger(
-    "com.expediagroup.graphql.plugin.client.generator.types.GenerateInterfaceTypeSpec"
+    "xyz.mcxross.graphql.plugin.client.generator.types.GenerateInterfaceTypeSpec"
   )
 
 /**

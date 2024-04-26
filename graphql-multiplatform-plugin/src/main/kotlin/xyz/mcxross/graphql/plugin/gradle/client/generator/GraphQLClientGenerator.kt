@@ -134,7 +134,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
       val operationTypeSpec =
         TypeSpec.classBuilder(capitalizedOperationName)
           .addAnnotation(Generated::class)
-          .addSuperinterface(
+          .superclass(
             ClassName(CORE_TYPES_PACKAGE, "GraphQLClientRequest")
               .parameterizedBy(kotlinResultTypeName)
           )
@@ -143,14 +143,12 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         PropertySpec.builder("query", STRING, KModifier.OVERRIDE)
           .initializer("%N", queryConstProp)
           .build()
+
       var operationNameProperty: PropertySpec? =
-        if (operationDefinition.name != null) {
-          PropertySpec.builder("operationName", STRING, KModifier.OVERRIDE)
-            .initializer("%S", operationDefinition.name)
-            .build()
-        } else {
-          null
-        }
+        PropertySpec.builder("operationName", STRING.copy(nullable = true), KModifier.OVERRIDE)
+          .initializer("%S", operationDefinition.name ?: "")
+          .build()
+
 
       if (config.serializer == GraphQLSerializer.KOTLINX) {
         operationTypeSpec.addAnnotation(Serializable::class)
@@ -180,7 +178,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         operationTypeSpec.primaryConstructor(constructor)
       }
 
-      val parameterizedReturnType =
+      /*val parameterizedReturnType =
         ClassName("kotlin.reflect", "KClass").parameterizedBy(kotlinResultTypeName)
       operationTypeSpec.addFunction(
         FunSpec.builder("responseType")
@@ -188,7 +186,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
           .returns(parameterizedReturnType)
           .addStatement("return %T::class", kotlinResultTypeName)
           .build()
-      )
+      )*/
       operationTypeSpec.addType(graphQLResponseTypeSpec)
 
       val polymorphicTypes = mutableListOf<ClassName>()
@@ -270,7 +268,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
 }
 
 /**
- * This is the reccommended approach now with the deprecation of String.capitalize from the Kotlin
+ * This is the recommended approach now with the deprecation of String.capitalize from the Kotlin
  * stdlib in version 1.5.
  */
 internal fun String.capitalizeFirstChar(): String = replaceFirstChar {

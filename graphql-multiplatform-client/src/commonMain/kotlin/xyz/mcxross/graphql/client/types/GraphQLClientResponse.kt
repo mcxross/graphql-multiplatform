@@ -16,18 +16,16 @@
 
 package xyz.mcxross.graphql.client.types
 
+import kotlinx.serialization.Serializable
+
 /**
  * GraphQL response that is spec complaint with serialization and deserialization.
  *
  * @see [GraphQL Specification](http://spec.graphql.org/June2018/#sec-Data) for additional details
  */
-interface GraphQLClientResponse<T> {
-  val data: T?
-    get() = null
-
-  val errors: List<GraphQLClientError>?
-    get() = null
-
-  val extensions: Map<String, Any?>?
-    get() = null
+@Serializable
+abstract class GraphQLClientResponse<T> {
+  abstract val data: T?
+  abstract val errors: List<GraphQLClientError>?
+  abstract val extensions: Map<String, Any?>?
 }

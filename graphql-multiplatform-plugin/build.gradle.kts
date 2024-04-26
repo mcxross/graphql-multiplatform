@@ -1,5 +1,5 @@
 description =
-    "Gradle Kotlin Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
+  "Gradle Kotlin Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
 
 plugins {
   kotlin("jvm")
@@ -36,14 +36,14 @@ java {
 }
 
 gradlePlugin {
-  website.set("https://opensource.expediagroup.com/graphql-kotlin/docs/")
+  website.set("https://oss.mcxross.xyz/graphql-multiplatform/docs/")
   vcsUrl.set("https://github.com/mcxross/graphql-multiplatform")
   plugins {
     register("graphQLPlugin") {
       id = "xyz.mcxross.graphql"
       displayName = "GraphQL Kotlin Gradle Plugin"
       description =
-          "Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
+        "Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
       implementationClass = "xyz.mcxross.graphql.plugin.gradle.GraphQLGradlePlugin"
       tags.set(listOf("graphql", "kotlin", "graphql-client", "schema-generator", "sdl"))
     }
@@ -56,22 +56,23 @@ val generateDefaultVersion by
       val defaultVersionFile =
           File("$buildDir/generated/src/xyz/mcxross/graphql/plugin/gradle", fileName)
 
-      inputs.property(fileName, project.version)
-      outputs.dir(defaultVersionFile.parent)
+    inputs.property(fileName, project.version)
+    outputs.dir(defaultVersionFile.parent)
 
-      doFirst {
-        defaultVersionFile.parentFile.mkdirs()
-        defaultVersionFile.writeText(
-            """
-                package xyz.mcxross.graphql.plugin.gradle
-                internal const val DEFAULT_PLUGIN_VERSION = "${project.version}"
-
-            """
-                .trimIndent())
-      }
+    doFirst {
+      defaultVersionFile.parentFile.mkdirs()
+      defaultVersionFile.writeText(
+        """
+        package xyz.mcxross.graphql.plugin.gradle
+        internal const val DEFAULT_PLUGIN_VERSION = "1.0-SNAPSHOT"
+    """.trimIndent()
+      )
     }
+  }
 
 sourceSets { main { java { srcDir(generateDefaultVersion) } } }
+
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 
 publishing {
   repositories {

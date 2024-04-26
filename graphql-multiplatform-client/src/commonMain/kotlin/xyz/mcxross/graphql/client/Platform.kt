@@ -16,13 +16,16 @@
 
 package xyz.mcxross.graphql.client
 
+import io.ktor.client.*
 import io.ktor.client.engine.*
-import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import xyz.mcxross.graphql.client.types.GraphQLClientRequest
 
-expect val defaultEngine: HttpClientEngine
+/**
+ * Create a new Ktor client with the given configuration.
+ *
+ * Each client is platform-specific with a different engine. Each engine has its own configuration
+ * options.
+ */
+expect fun httpClient(engine: HttpClientEngine? = null): HttpClient
 
-expect fun createType(request: GraphQLClientRequest<*>): KType
 
-expect fun <T : Any> createType(resultType: KClass<T>): KType
+val client = httpClient()

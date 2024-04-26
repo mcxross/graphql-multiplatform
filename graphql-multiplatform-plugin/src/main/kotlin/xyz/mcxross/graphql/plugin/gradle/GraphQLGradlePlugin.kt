@@ -25,6 +25,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.SourceSetContainer
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 import xyz.mcxross.graphql.plugin.gradle.tasks.DOWNLOAD_SDL_TASK_NAME
 import xyz.mcxross.graphql.plugin.gradle.tasks.GENERATE_CLIENT_TASK_NAME
 import xyz.mcxross.graphql.plugin.gradle.tasks.GENERATE_SDL_TASK_NAME
@@ -64,7 +65,9 @@ class GraphQLGradlePlugin : Plugin<Project> {
       configuration.description = "Configuration for generating GraphQL client"
 
       configuration.dependencies.add(
-        project.dependencies.create("xyz.mcxross.graphql.client:$DEFAULT_PLUGIN_VERSION")
+        project.dependencies.create(
+          "xyz.mcxross.graphql.client:graphql-multiplatform-client:$DEFAULT_PLUGIN_VERSION"
+        )
       )
     }
 
@@ -204,25 +207,25 @@ class GraphQLGradlePlugin : Plugin<Project> {
       clientGeneratingTaskNames.add(generateClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateClientTask.pluginClasspath.setFrom(configuration)
-      if (!isAndroidProject) {
+      //if (!isAndroidProject) {
         configureDefaultProjectSourceSet(
           project = project,
           outputDirectory = generateClientTask.outputDirectory,
         )
-      }
+      //}
     }
     project.tasks.withType(GraphQLGenerateTestClientTask::class.java).configureEach {
       generateTestClientTask ->
       testClientGeneratingTaskNames.add(generateTestClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateTestClientTask.pluginClasspath.setFrom(configuration)
-      if (!isAndroidProject) {
+      //if (!isAndroidProject) {
         configureDefaultProjectSourceSet(
           project = project,
           outputDirectory = generateTestClientTask.outputDirectory,
-          targetSourceSet = "test",
+          targetSourceSet = "commonTest",
         )
-      }
+      //}
     }
     project.tasks.withType(GraphQLIntrospectSchemaTask::class.java).configureEach {
       introspectionTask ->
@@ -248,7 +251,7 @@ class GraphQLGradlePlugin : Plugin<Project> {
       }
     }
 
-    if (isAndroidProject) {
+    /*if (isAndroidProject) {
       // Android plugins are eagerly configured so just adding the tasks outputs to the source set
       // is not enough,
       // we also need to explicitly configure compile dependencies
@@ -257,15 +260,16 @@ class GraphQLGradlePlugin : Plugin<Project> {
         clientGeneratingTaskNames,
         testClientGeneratingTaskNames,
       )
-    }
+    }*/
   }
 
   private fun configureDefaultProjectSourceSet(
     project: Project,
     outputDirectory: DirectoryProperty,
-    targetSourceSet: String = "main",
+    targetSourceSet: String = "commonMain",
   ) {
-    val sourceSetContainer = project.findProperty("sourceSets") as? SourceSetContainer
-    sourceSetContainer?.findByName(targetSourceSet)?.java?.srcDir(outputDirectory)
+    val sourceSetContainer = project.extensions.findByType(KotlinSourceSetContainer::class.java)
+    val commonSourceSet = sourceSetContainer?.sourceSets?.findByName(targetSourceSet)
+    commonSourceSet?.kotlin?.srcDir(outputDirectory.get().asFile)
   }
 }

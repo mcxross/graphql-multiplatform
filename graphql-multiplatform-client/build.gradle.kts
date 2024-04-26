@@ -52,6 +52,8 @@ kotlin {
             api(libs.ktor.client.core)
             implementation(libs.uri.kmp)
             api(libs.ktor.client.serialization)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlin.reflect)
             implementation(libs.stately.concurrent.collections)
         }

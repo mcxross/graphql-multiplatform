@@ -16,12 +16,17 @@
 
 package xyz.mcxross.graphql.client
 
+import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+
 
 /**
- * Default HTTP client engine for Android platform. Uses OkHttp as the underlying HTTP client
+ * Default HTTP client for Android platform. Uses OkHttp as the underlying HTTP client
  * implementation.
  */
-actual val defaultEngine: HttpClientEngine
-  get() = OkHttp.create()
+actual fun httpClient(engine: HttpClientEngine?) =
+  HttpClient(OkHttp) { install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) } }

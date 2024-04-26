@@ -24,6 +24,7 @@ import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Project
 import xyz.mcxross.graphql.plugin.gradle.tasks.GraphQLGenerateClientTask
 import xyz.mcxross.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
+import java.util.*
 
 // isolating Android specific code that will be conditionally executed only on Android projects
 // see https://github.com/gradle/gradle/issues/8411
@@ -69,4 +70,4 @@ internal fun configureAndroidCompileTasks(
 private fun findTestVariants(extension: TestedExtension): Set<BaseVariant> =
   extension.testVariants + extension.unitTestVariants
 
-private fun BaseVariant.calculateCompileTaskName() = "compile${this.name.capitalize()}Kotlin"
+private fun BaseVariant.calculateCompileTaskName() = "compile${this.name.capitalize(Locale.ROOT)}Kotlin"
