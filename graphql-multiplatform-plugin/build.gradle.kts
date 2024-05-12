@@ -36,7 +36,7 @@ java {
 }
 
 gradlePlugin {
-  website.set("https://oss.mcxross.xyz/graphql-multiplatform")
+  website.set("https://github.com/mcxross/graphql-multiplatform")
   vcsUrl.set("https://github.com/mcxross/graphql-multiplatform.git")
   plugins {
     register("graphQLPlugin") {
