@@ -1,5 +1,5 @@
 description =
-  "Gradle Kotlin Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
+  "Gradle Kotlin Gradle Plugin that can generate type-safe GraphQL Kotlin Multiplatform client and GraphQL schema in SDL format"
 
 plugins {
   kotlin("jvm")
@@ -36,14 +36,14 @@ java {
 }
 
 gradlePlugin {
-  website.set("https://oss.mcxross.xyz/graphql-multiplatform/docs/")
-  vcsUrl.set("https://github.com/mcxross/graphql-multiplatform")
+  website.set("https://oss.mcxross.xyz/graphql-multiplatform")
+  vcsUrl.set("https://github.com/mcxross/graphql-multiplatform.git")
   plugins {
     register("graphQLPlugin") {
       id = "xyz.mcxross.graphql"
       displayName = "GraphQL Kotlin Gradle Plugin"
       description =
-        "Gradle Plugin that can generate type-safe GraphQL Kotlin client and GraphQL schema in SDL format using reflections"
+        "Gradle Plugin that can generate type-safe GraphQL Kotlin Multiplatform client and GraphQL schema in SDL format"
       implementationClass = "xyz.mcxross.graphql.plugin.gradle.GraphQLGradlePlugin"
       tags.set(listOf("graphql", "kotlin", "graphql-client", "schema-generator", "sdl"))
     }
