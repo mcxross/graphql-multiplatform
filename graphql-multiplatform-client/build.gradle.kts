@@ -10,7 +10,7 @@ plugins {
 
 group = "xyz.mcxross.graphql.client"
 
-version = "0.1.0-beta01"
+version = "0.1.0-beta02"
 
 extra["isReleaseVersion"] = !version.toString().endsWith("-SNAPSHOT")
 
