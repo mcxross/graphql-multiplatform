@@ -1,5 +1,5 @@
 [versions]
-android-plugin = "8.2.0"
+android-plugin = "8.4.1"
 graphql-java = "21.1"
 graalvm = "0.9.28"
 jackson = "2.15.2"
@@ -22,7 +22,7 @@ stately-concurrent-collections = "2.0.7"
 # plugins
 # TODO kotlin 1.9 upgrade -> detekt 1.23.1+ uses kotlin 1.9
 detekt = "1.23.0"
-dokka = "1.9.10"
+dokka = "1.9.20"
 ktlint-plugin = "10.3.0"
 maven-plugin-development = "0.4.2"
 nexus-publish-plugin = "1.3.0"
