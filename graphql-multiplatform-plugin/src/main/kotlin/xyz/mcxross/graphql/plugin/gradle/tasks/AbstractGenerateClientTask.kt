@@ -16,8 +16,6 @@
 
 package xyz.mcxross.graphql.plugin.gradle.tasks
 
-import java.io.File
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -39,7 +37,10 @@ import org.gradle.workers.WorkerExecutor
 import xyz.mcxross.graphql.plugin.gradle.actions.GenerateClientAction
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLParserOptions
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLScalar
-import xyz.mcxross.graphql.plugin.gradle.config.GraphQLSerializer
+import java.io.File
+import javax.inject.Inject
+
+
 
 /**
  * Generate GraphQL Kotlin client and corresponding data classes based on the provided GraphQL
@@ -113,15 +114,6 @@ abstract class AbstractGenerateClientTask : DefaultTask() {
   @Input
   @Optional
   @Option(
-    option = "serializer",
-    description = "JSON serializer that will be used to generate the data classes.",
-  )
-  val serializer: Property<GraphQLSerializer> =
-    project.objects.property(GraphQLSerializer::class.java)
-
-  @Input
-  @Optional
-  @Option(
     option = "useOptionalInputWrapper",
     description =
       "Opt-in flag to wrap nullable arguments in OptionalInput that supports both null and undefined.",
@@ -143,7 +135,6 @@ abstract class AbstractGenerateClientTask : DefaultTask() {
 
     allowDeprecatedFields.convention(false)
     customScalars.convention(emptyList())
-    serializer.convention(GraphQLSerializer.JACKSON)
     useOptionalInputWrapper.convention(false)
     parserOptions.convention(GraphQLParserOptions())
   }
@@ -191,7 +182,6 @@ abstract class AbstractGenerateClientTask : DefaultTask() {
       parameters.packageName.set(targetPackage)
       parameters.allowDeprecated.set(allowDeprecatedFields)
       parameters.customScalars.set(customScalars)
-      parameters.serializer.set(serializer)
       parameters.schemaPath.set(graphQLSchemaPath)
       parameters.queryFiles.set(targetQueryFiles)
       parameters.targetDirectory.set(targetDirectory)
@@ -207,9 +197,9 @@ abstract class AbstractGenerateClientTask : DefaultTask() {
     logger.debug("  schema file = $schemaPath")
     logger.debug("  queries")
     queryFiles.forEach { logger.debug("    - ${it.name}") }
-    logger.debug("  packageName = $packageName")
-    logger.debug("  allowDeprecatedFields = $allowDeprecatedFields")
-    logger.debug("  parserOptions = $parserOptions")
+    logger.debug("  packageName = {}", packageName)
+    logger.debug("  allowDeprecatedFields = {}", allowDeprecatedFields)
+    logger.debug("  parserOptions = {}", parserOptions)
     logger.debug("  converters")
     customScalars.get().forEach { (customScalar, type, converter) ->
       logger.debug("    - custom scalar = $customScalar")

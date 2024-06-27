@@ -26,9 +26,9 @@ import graphql.language.FragmentSpread
 import graphql.language.ObjectTypeDefinition
 import graphql.language.SelectionSet
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.LongAsStringSerializer
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.InvalidSelectionSetException
 import xyz.mcxross.graphql.plugin.gradle.client.generator.extensions.findFragmentDefinition
 
@@ -48,9 +48,7 @@ internal fun generateGraphQLObjectTypeSpec(
     TypeSpec.classBuilder(typeName).addModifiers(KModifier.DATA).addAnnotation(Generated::class)
   objectDefinition.description?.content?.let { kdoc -> objectTypeSpecBuilder.addKdoc("%L", kdoc) }
 
-  if (context.serializer == GraphQLSerializer.KOTLINX) {
-    objectTypeSpecBuilder.addAnnotation(Serializable::class)
-  }
+  objectTypeSpecBuilder.addAnnotation(Serializable::class)
 
   val constructorBuilder = FunSpec.constructorBuilder()
   generatePropertySpecs(

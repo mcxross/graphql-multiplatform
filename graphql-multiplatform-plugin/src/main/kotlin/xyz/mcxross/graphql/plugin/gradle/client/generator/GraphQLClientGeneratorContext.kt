@@ -37,7 +37,6 @@ data class GraphQLClientGeneratorContext(
   val queryDocument: Document,
   val allowDeprecated: Boolean = false,
   val customScalarMap: Map<String, GraphQLScalar> = mapOf(),
-  val serializer: GraphQLSerializer = GraphQLSerializer.JACKSON,
   val useOptionalInputWrapper: Boolean = false,
 ) {
   // per operation caches

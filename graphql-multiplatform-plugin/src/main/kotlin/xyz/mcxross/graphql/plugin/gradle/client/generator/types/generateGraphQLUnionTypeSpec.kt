@@ -42,7 +42,7 @@ internal fun generateGraphQLUnionTypeSpec(
 
   val unionName = unionNameOverride ?: unionDefinition.name
   val unionImplementations =
-    unionDefinition.memberTypes.filterIsInstance(TypeName::class.java).map { it.name }
+    unionDefinition.memberTypes.filterIsInstance<TypeName>().map { it.name }
 
   return generateInterfaceTypeSpec(
     context = context,

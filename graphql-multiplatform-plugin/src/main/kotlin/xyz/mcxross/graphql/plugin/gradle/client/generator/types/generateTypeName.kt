@@ -43,11 +43,9 @@ import graphql.language.TypeDefinition
 import graphql.language.UnionTypeDefinition
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.client.generator.ScalarConverterInfo
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.UnknownGraphQLTypeException
 import xyz.mcxross.graphql.plugin.gradle.client.generator.extensions.findFragmentDefinition
-import xyz.mcxross.graphql.plugin.gradle.client.generator.types.*
 
 /** Generate [TypeName] reference to a Kotlin class representation of an underlying GraphQL type. */
 internal fun generateTypeName(
@@ -71,7 +69,7 @@ internal fun generateTypeName(
     is ListType -> {
       val type = generateTypeName(context, graphQLType.type, selectionSet)
       val parameterizedType =
-        if (context.serializer == GraphQLSerializer.KOTLINX && context.isCustomScalar(type)) {
+        if (context.isCustomScalar(type)) {
           val (serializerClassName, _) =
             context.scalarClassToConverterTypeSpecs[type]
               as ScalarConverterInfo.KotlinxSerializerInfo
@@ -110,16 +108,22 @@ internal fun generateCustomClassName(
   val graphQLTypeName = graphQLTypeDefinition.name
   val cachedTypeNames = context.classNameCache[graphQLTypeName]
 
-  return if (cachedTypeNames == null || cachedTypeNames.isEmpty()) {
+  return if (cachedTypeNames.isNullOrEmpty()) {
     // build new custom type
     if (
       graphQLTypeDefinition is ScalarTypeDefinition &&
         context.customScalarMap[graphQLTypeName] == null
     ) {
-      val typeAlias = generateGraphQLCustomScalarTypeAlias(context, graphQLTypeDefinition)
-      val className = ClassName(context.packageName, typeAlias.name)
-      context.classNameCache[graphQLTypeName] = mutableListOf(className)
-      className
+      if (graphQLTypeDefinition.name.equals("numeric")) {
+        ClassName("kotlin", "Long")
+      } else if (graphQLTypeDefinition.name.equals("bigint")) {
+        ClassName("kotlin", "Long")
+      } else {
+        val typeAlias = generateGraphQLCustomScalarTypeAlias(context, graphQLTypeDefinition)
+        val className = ClassName(context.packageName, typeAlias.name)
+        context.classNameCache[graphQLTypeName] = mutableListOf(className)
+        className
+      }
     } else {
       lateinit var className: ClassName
       // generate corresponding type spec

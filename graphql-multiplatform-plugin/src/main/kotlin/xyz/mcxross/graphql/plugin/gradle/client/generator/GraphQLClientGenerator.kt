@@ -34,9 +34,12 @@ import graphql.schema.idl.TypeDefinitionRegistry
 import java.io.File
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.LongAsStringSerializer
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.MultipleOperationsInFileException
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.SchemaUnavailableException
+import xyz.mcxross.graphql.plugin.gradle.client.generator.extensions.capitalizeFirstChar
+import xyz.mcxross.graphql.plugin.gradle.client.generator.extensions.toUpperUnderscore
 import xyz.mcxross.graphql.plugin.gradle.client.generator.types.generateGraphQLObjectTypeSpec
 import xyz.mcxross.graphql.plugin.gradle.client.generator.types.generateVariableTypeSpec
 
@@ -52,8 +55,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
   private val sharedTypes: MutableMap<ClassName, List<TypeSpec>> = mutableMapOf()
   private var generateOptionalSerializer: Boolean = false
   private val graphQLSchema: TypeDefinitionRegistry
-  private val parserOptions: ParserOptions =
-    ParserOptions.newParserOptions().also { this.config.parserOptions(it) }.build()
+  private val parserOptions: ParserOptions = ParserOptions.newParserOptions().also { this.config.parserOptions(it) }.build()
 
   init {
     graphQLSchema = parseSchema(schemaPath)
@@ -90,8 +92,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
     val queryConst = queryFile.readText().trim()
     val queryDocument = documentParser.parseDocument(queryConst, parserOptions)
 
-    val operationDefinitions =
-      queryDocument.definitions.filterIsInstance(OperationDefinition::class.java)
+    val operationDefinitions = queryDocument.definitions.filterIsInstance<OperationDefinition>()
     if (operationDefinitions.size > 1) {
       throw MultipleOperationsInFileException(queryFile)
     }
@@ -114,7 +115,6 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
           queryDocument = queryDocument,
           allowDeprecated = config.allowDeprecated,
           customScalarMap = config.customScalarMap,
-          serializer = config.serializer,
           useOptionalInputWrapper = config.useOptionalInputWrapper,
         )
       val queryConstName = capitalizedOperationName.toUpperUnderscore()
@@ -149,13 +149,10 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
           .initializer("%S", operationDefinition.name ?: "")
           .build()
 
-
-      if (config.serializer == GraphQLSerializer.KOTLINX) {
-        operationTypeSpec.addAnnotation(Serializable::class)
-        queryProperty = queryProperty.toBuilder().addAnnotation(Required::class).build()
-        operationNameProperty =
-          operationNameProperty?.toBuilder()?.addAnnotation(Required::class)?.build()
-      }
+      operationTypeSpec.addAnnotation(Serializable::class)
+      queryProperty = queryProperty.toBuilder().addAnnotation(Required::class).build()
+      operationNameProperty =
+        operationNameProperty?.toBuilder()?.addAnnotation(Required::class)?.build()
 
       operationTypeSpec.addProperty(queryProperty)
       operationNameProperty?.let { operationTypeSpec.addProperty(it) }
@@ -203,8 +200,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         fileSpecs.add(polymorphicTypeSpec.build())
       }
       context.typeSpecs.minus(polymorphicTypes).forEach { (className, typeSpec) ->
-        val outputTypeFileSpec =
-          FileSpec.builder(className.packageName, className.simpleName).addType(typeSpec).build()
+        val outputTypeFileSpec = FileSpec.builder(className.packageName, className.simpleName).addType(typeSpec).build()
         fileSpecs.add(outputTypeFileSpec)
       }
       operationFileSpec.addType(operationTypeSpec.build())
@@ -224,6 +220,7 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
           }
         }
       }
+
       typeAliases.putAll(context.typeAliases)
 
       if (context.requireOptionalSerializer) {
@@ -265,29 +262,4 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
       SchemaParser().parse(schemaInputStream)
     }
   }
-}
-
-/**
- * This is the recommended approach now with the deprecation of String.capitalize from the Kotlin
- * stdlib in version 1.5.
- */
-internal fun String.capitalizeFirstChar(): String = replaceFirstChar {
-  if (it.isLowerCase()) it.uppercaseChar() else it
-}
-
-internal fun String.toUpperUnderscore(): String {
-  val builder = StringBuilder()
-  val nameCharArray = this.toCharArray()
-  for ((index, c) in nameCharArray.withIndex()) {
-    if (c.isUpperCase() && index > 0) {
-      if (
-        nameCharArray[index - 1].isLowerCase() ||
-          (index < nameCharArray.size - 1 && nameCharArray[index + 1].isLowerCase())
-      ) {
-        builder.append("_")
-      }
-    }
-    builder.append(c.uppercaseChar())
-  }
-  return builder.toString()
 }

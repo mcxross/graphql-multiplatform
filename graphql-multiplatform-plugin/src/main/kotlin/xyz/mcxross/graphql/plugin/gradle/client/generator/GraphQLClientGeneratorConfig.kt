@@ -27,8 +27,6 @@ data class GraphQLClientGeneratorConfig(
   val allowDeprecated: Boolean = false,
   /** Custom scalar type to converter mapping. */
   val customScalarMap: Map<String, GraphQLScalar> = emptyMap(),
-  /** Type of JSON serializer to be used. */
-  val serializer: GraphQLSerializer = GraphQLSerializer.JACKSON,
   /** Explicit opt-in flag to enable support for optional inputs. */
   val useOptionalInputWrapper: Boolean = false,
   /** Set parser options for processing GraphQL queries and schema definition language documents */
@@ -57,10 +55,4 @@ data class GraphQLScalar(
       ClassName(this.substring(0, index), this.substring(index + 1))
     }
   }
-}
-
-/** Type of JSON serializer that will be used to generate the data classes. */
-enum class GraphQLSerializer {
-  KOTLINX,
-  JACKSON
 }

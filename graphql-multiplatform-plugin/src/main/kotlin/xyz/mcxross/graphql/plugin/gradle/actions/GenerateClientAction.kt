@@ -18,8 +18,8 @@ package xyz.mcxross.graphql.plugin.gradle.actions
 
 import org.gradle.workers.WorkAction
 import xyz.mcxross.graphql.plugin.gradle.client.generateClient
+import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorConfig
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLScalar
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.parameters.GenerateClientParameters
 
 /**
@@ -36,21 +36,18 @@ abstract class GenerateClientAction : WorkAction<GenerateClientParameters> {
     val allowDeprecated = parameters.allowDeprecated.get()
     val customScalarMap =
       parameters.customScalars.get().map { GraphQLScalar(it.scalar, it.type, it.converter) }
-    val serializer = GraphQLSerializer.valueOf(parameters.serializer.get().name)
     val schemaPath = parameters.schemaPath.get()
     val queryFiles = parameters.queryFiles.get()
     val targetDirectory = parameters.targetDirectory.get()
     val useOptionalInputWrapper = parameters.useOptionalInputWrapper.get()
     val parserOptions = parameters.parserOptions.get()
 
-    generateClient(
-        targetPackage,
-        allowDeprecated,
-        customScalarMap,
-        serializer,
-        schemaPath,
-        queryFiles,
-        useOptionalInputWrapper,
+    val config =
+      GraphQLClientGeneratorConfig(
+        packageName = targetPackage,
+        allowDeprecated = allowDeprecated,
+        customScalarMap = customScalarMap.associateBy { it.scalar },
+        useOptionalInputWrapper = useOptionalInputWrapper,
         parserOptions = {
           parserOptions.maxTokens?.let { maxTokens(it) }
           parserOptions.maxWhitespaceTokens?.let { maxWhitespaceTokens(it) }
@@ -61,6 +58,6 @@ abstract class GenerateClientAction : WorkAction<GenerateClientParameters> {
           parserOptions.captureLineComments?.let { captureLineComments(it) }
         },
       )
-      .forEach { it.writeTo(targetDirectory) }
+    generateClient(config, schemaPath, queryFiles).forEach { it.writeTo(targetDirectory) }
   }
 }

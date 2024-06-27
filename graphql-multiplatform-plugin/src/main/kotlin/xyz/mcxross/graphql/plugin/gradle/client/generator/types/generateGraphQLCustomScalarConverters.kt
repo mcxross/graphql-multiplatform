@@ -16,8 +16,6 @@
 
 package xyz.mcxross.graphql.plugin.gradle.client.generator.types
 
-import com.fasterxml.jackson.databind.util.StdConverter
-import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -34,7 +32,6 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonPrimitive
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.client.generator.ScalarConverterInfo
 
 /**
@@ -50,62 +47,7 @@ internal fun generateGraphQLCustomScalarConverters(
   scalarClassName: ClassName,
   converterClassName: ClassName,
 ): ScalarConverterInfo {
-  return if (context.serializer == GraphQLSerializer.JACKSON) {
-    generateGraphQLCustomScalarJacksonConverters(context, scalarClassName, converterClassName)
-  } else {
-    generateGraphQLCustomScalarKSerializer(context, scalarClassName, converterClassName)
-  }
-}
-
-private fun generateGraphQLCustomScalarJacksonConverters(
-  context: GraphQLClientGeneratorContext,
-  scalarClassName: ClassName,
-  converterClassName: ClassName,
-): ScalarConverterInfo {
-  val customScalarName = scalarClassName.simpleName
-  val converter =
-    PropertySpec.builder("converter", converterClassName)
-      .initializer("%T()", converterClassName)
-      .addModifiers(KModifier.PRIVATE)
-      .build()
-
-  val serializeConverterName = "${customScalarName}ToAnyConverter"
-  val serializerConverterTypeSpec =
-    TypeSpec.classBuilder(serializeConverterName)
-      .superclass(StdConverter::class.asTypeName().parameterizedBy(scalarClassName, ANY))
-      .addAnnotation(Generated::class)
-      .addProperty(converter)
-      .addFunction(
-        FunSpec.builder("convert")
-          .addModifiers(KModifier.OVERRIDE)
-          .returns(ANY)
-          .addParameter("value", scalarClassName)
-          .addStatement("return converter.toJson(value)")
-          .build()
-      )
-      .build()
-
-  val deserializeConverterName = "AnyTo${customScalarName}Converter"
-  val deserializerConverterTypeSpec =
-    TypeSpec.classBuilder(deserializeConverterName)
-      .superclass(StdConverter::class.asTypeName().parameterizedBy(ANY, scalarClassName))
-      .addAnnotation(Generated::class)
-      .addProperty(converter)
-      .addFunction(
-        FunSpec.builder("convert")
-          .addModifiers(KModifier.OVERRIDE)
-          .returns(scalarClassName)
-          .addParameter("value", ANY)
-          .addStatement("return converter.toScalar(value)")
-          .build()
-      )
-      .build()
-  return ScalarConverterInfo.JacksonConvertersInfo(
-    serializerClassName = ClassName("${context.packageName}.scalars", serializeConverterName),
-    serializerTypeSpec = serializerConverterTypeSpec,
-    deserializerClassName = ClassName("${context.packageName}.scalars", deserializeConverterName),
-    deserializerTypeSpec = deserializerConverterTypeSpec,
-  )
+  return generateGraphQLCustomScalarKSerializer(context, scalarClassName, converterClassName)
 }
 
 private fun generateGraphQLCustomScalarKSerializer(

@@ -28,7 +28,7 @@ abstract class GraphQLGenerateTestClientTask : AbstractGenerateClientTask() {
   init {
     description = "Generate HTTP test client from the specified GraphQL queries."
 
-    queryFileDirectory.convention(project.layout.projectDirectory.dir("src/test/resources"))
-    outputDirectory.convention(project.layout.buildDirectory.dir("generated/source/graphql/test"))
+    queryFileDirectory.convention(project.layout.projectDirectory.dir("src/commonTest/resources"))
+    outputDirectory.convention(project.layout.buildDirectory.dir("generated/source/graphql/commonTest"))
   }
 }

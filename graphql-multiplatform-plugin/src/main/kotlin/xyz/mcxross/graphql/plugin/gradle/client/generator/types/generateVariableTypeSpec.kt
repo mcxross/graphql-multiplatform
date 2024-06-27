@@ -24,7 +24,6 @@ import graphql.language.VariableDefinition
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 
 /** Generate [TypeSpec] data class wrapper for variables used within the target query. */
 internal fun generateVariableTypeSpec(
@@ -36,9 +35,8 @@ internal fun generateVariableTypeSpec(
     TypeSpec.classBuilder(variablesTypeName)
       .addModifiers(KModifier.DATA)
       .addAnnotation(Generated::class)
-  if (context.serializer == GraphQLSerializer.KOTLINX) {
-    variableTypeSpec.addAnnotation(Serializable::class)
-  }
+
+  variableTypeSpec.addAnnotation(Serializable::class)
 
   val constructorSpec = FunSpec.constructorBuilder()
   variableDefinitions.forEach { variableDef ->

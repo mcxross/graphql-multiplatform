@@ -1,8 +1,10 @@
+import org.jetbrains.dokka.gradle.DokkaTask
 import java.util.*
 
 plugins {
   id("com.android.library")
   kotlin("multiplatform")
+  alias(libs.plugins.dokka)
   alias(libs.plugins.kotlin.serialization)
   id("maven-publish")
   id("signing")
@@ -10,7 +12,7 @@ plugins {
 
 group = "xyz.mcxross.graphql.client"
 
-version = "0.1.0-beta02"
+version = "0.1.0-beta05"
 
 extra["isReleaseVersion"] = !version.toString().endsWith("-SNAPSHOT")
 
@@ -139,6 +141,26 @@ if (secretPropsFile.exists()) {
   ext["signingKey"] = getProperty("SIGNING_KEY")
 }
 
+tasks.getByName<DokkaTask>("dokkaHtml") {
+  moduleName.set("GraphQL Multiplatform Client")
+  outputDirectory.set(file(buildDir.resolve("dokka")))
+}
+
+tasks.withType<DokkaTask>().configureEach {
+  notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/2231")
+}
+
+val javadocJar =
+  tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    dependsOn("dokkaHtml")
+    from(buildDir.resolve("dokka"))
+  }
+
+val signingTasks = tasks.withType<Sign>()
+tasks.withType<AbstractPublishToMaven>().configureEach {
+  dependsOn(signingTasks)
+}
 publishing {
   if (hasProperty("sonatypeUser") && hasProperty("sonatypePass")) {
     repositories {
@@ -161,6 +183,7 @@ publishing {
   }
 
   publications.withType<MavenPublication> {
+    artifact(javadocJar.get())
     pom {
       name.set("GraphQL Multiplatform Client")
       description.set(
@@ -188,14 +211,4 @@ publishing {
 
 tasks.withType<Sign>().configureEach {
   onlyIf("isReleaseVersion is set") { project.extra["isReleaseVersion"] as Boolean }
-}
-
-signing {
-  val sonatypeGpgKey = getProperty("signingKey")
-  val sonatypeGpgKeyPassword = getProperty("keyPassword")
-  useGpgCmd()
-
-  configurations.forEach {
-    sign(it)
-  }
 }

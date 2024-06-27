@@ -75,8 +75,6 @@ class GraphQLGradlePlugin : Plugin<Project> {
       configuration.isVisible = true
       configuration.isTransitive = true
       configuration.description = "Configuration for generating GraphQL schema in SDL format"
-
-      // configuration.dependencies.add(project.dependencies.create("com.expediagroup:graphql-kotlin-sdl-generator:$DEFAULT_PLUGIN_VERSION"))
     }
   }
 
@@ -110,7 +108,6 @@ class GraphQLGradlePlugin : Plugin<Project> {
           generateClientTask.queryFileDirectory.set(File(queryFileDirectory))
         }
         generateClientTask.queryFiles.setFrom(extension.clientExtension.queryFiles)
-        generateClientTask.serializer.convention(extension.clientExtension.serializer)
         generateClientTask.useOptionalInputWrapper.convention(
           extension.clientExtension.useOptionalInputWrapper
         )
@@ -207,25 +204,25 @@ class GraphQLGradlePlugin : Plugin<Project> {
       clientGeneratingTaskNames.add(generateClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateClientTask.pluginClasspath.setFrom(configuration)
-      //if (!isAndroidProject) {
-        configureDefaultProjectSourceSet(
-          project = project,
-          outputDirectory = generateClientTask.outputDirectory,
-        )
-      //}
+      // if (!isAndroidProject) {
+      configureDefaultProjectSourceSet(
+        project = project,
+        outputDirectory = generateClientTask.outputDirectory,
+      )
+      // }
     }
     project.tasks.withType(GraphQLGenerateTestClientTask::class.java).configureEach {
       generateTestClientTask ->
       testClientGeneratingTaskNames.add(generateTestClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateTestClientTask.pluginClasspath.setFrom(configuration)
-      //if (!isAndroidProject) {
-        configureDefaultProjectSourceSet(
-          project = project,
-          outputDirectory = generateTestClientTask.outputDirectory,
-          targetSourceSet = "commonTest",
-        )
-      //}
+      // if (!isAndroidProject) {
+      configureDefaultProjectSourceSet(
+        project = project,
+        outputDirectory = generateTestClientTask.outputDirectory,
+        targetSourceSet = "commonTest",
+      )
+      // }
     }
     project.tasks.withType(GraphQLIntrospectSchemaTask::class.java).configureEach {
       introspectionTask ->

@@ -16,14 +16,11 @@
 
 package xyz.mcxross.graphql.plugin.gradle.client.generator.types
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
@@ -41,7 +38,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.InvalidFragmentException
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.MissingTypeNameException
 
@@ -72,14 +68,10 @@ internal fun generateInterfaceTypeSpec(
   implementations: List<String>,
 ): TypeSpec {
   val interfaceTypeSpec =
-    if (context.serializer == GraphQLSerializer.KOTLINX) {
-      TypeSpec.classBuilder(interfaceName)
-        .addModifiers(KModifier.SEALED)
-        .addAnnotation(Generated::class)
-        .addAnnotation(kotlinx.serialization.Serializable::class)
-    } else {
-      TypeSpec.interfaceBuilder(interfaceName).addAnnotation(Generated::class)
-    }
+    TypeSpec.classBuilder(interfaceName)
+      .addModifiers(KModifier.SEALED)
+      .addAnnotation(Generated::class)
+      .addAnnotation(Serializable::class)
 
   if (kdoc != null) {
     interfaceTypeSpec.addKdoc("%L", kdoc)
@@ -192,25 +184,6 @@ internal fun generateInterfaceTypeSpec(
   }
 
   val fallbackClassName = generateFallbackImplementation(context, interfaceName, commonProperties)
-  if (context.serializer == GraphQLSerializer.JACKSON) {
-    // add jackson annotations to handle deserialization
-    val jsonTypeInfoIdName = MemberName("com.fasterxml.jackson.annotation", "JsonTypeInfo.Id.NAME")
-    val jsonTypeInfoAsProperty =
-      MemberName("com.fasterxml.jackson.annotation", "JsonTypeInfo.As.PROPERTY")
-    interfaceTypeSpec.addAnnotation(
-      AnnotationSpec.builder(JsonTypeInfo::class.java)
-        .addMember("use = %M", jsonTypeInfoIdName)
-        .addMember("include = %M", jsonTypeInfoAsProperty)
-        .addMember("property = %S", "__typename")
-        .addMember("defaultImpl = %T::class", fallbackClassName)
-        .build()
-    )
-    interfaceTypeSpec.addAnnotation(
-      AnnotationSpec.builder(JsonSubTypes::class.java)
-        .addMember("value = [%L]", jsonSubTypesCodeBlock.build())
-        .build()
-    )
-  }
 
   return interfaceTypeSpec.build()
 }
@@ -231,17 +204,12 @@ private fun updateImplementationTypeSpecWithSuperInformation(
   val builder = implementationTypeSpec.toBuilder()
   val superClassName =
     ClassName("${context.packageName}.${context.operationName.lowercase()}", interfaceName)
-  if (context.serializer == GraphQLSerializer.KOTLINX) {
-    builder
-      .addAnnotation(
-        AnnotationSpec.builder(SerialName::class)
-          .addMember("value = %S", implementationName)
-          .build()
-      )
-      .superclass(superClassName)
-  } else {
-    builder.addSuperinterface(superClassName)
-  }
+
+  builder
+    .addAnnotation(
+      AnnotationSpec.builder(SerialName::class).addMember("value = %S", implementationName).build()
+    )
+    .superclass(superClassName)
 
   if (implementationTypeSpec.propertySpecs.isNotEmpty()) {
     val constructor = FunSpec.constructorBuilder()
@@ -280,16 +248,12 @@ private fun generateFallbackImplementation(
         "Fallback $interfaceName implementation that will be used when unknown/unhandled type is encountered."
       )
       .also {
-        if (context.serializer == GraphQLSerializer.KOTLINX) {
-          it
-            .addAnnotation(Serializable::class)
-            .superclass(superClassName)
-            .addKdoc(
-              "\n\nNOTE: This fallback logic has to be manually registered with the instance of GraphQLClientKotlinxSerializer. See documentation for details."
-            )
-        } else {
-          it.addSuperinterface(superClassName)
-        }
+        it
+          .addAnnotation(Serializable::class)
+          .superclass(superClassName)
+          .addKdoc(
+            "\n\nNOTE: This fallback logic has to be manually registered with the instance of GraphQLClientKotlinxSerializer. See documentation for details."
+          )
 
         if (commonProperties.isNotEmpty()) {
           it.addModifiers(KModifier.DATA)

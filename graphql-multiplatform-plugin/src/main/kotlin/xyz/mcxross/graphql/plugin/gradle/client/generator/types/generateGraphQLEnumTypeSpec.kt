@@ -16,8 +16,6 @@
 
 package xyz.mcxross.graphql.plugin.gradle.client.generator.types
 
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.Directives.DeprecatedDirective
@@ -27,7 +25,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 
 internal const val UNKNOWN_VALUE = "__UNKNOWN_VALUE"
 
@@ -60,19 +57,11 @@ internal fun generateGraphQLEnumTypeSpec(
     }
     val enumName = enumValueDefinition.name.uppercase()
     if (enumName != enumValueDefinition.name) {
-      if (context.serializer == GraphQLSerializer.JACKSON) {
-        enumValueTypeSpecBuilder.addAnnotation(
-          AnnotationSpec.builder(JsonProperty::class.java)
-            .addMember("%S", enumValueDefinition.name)
-            .build()
-        )
-      } else {
-        enumValueTypeSpecBuilder.addAnnotation(
-          AnnotationSpec.builder(SerialName::class.java)
-            .addMember("%S", enumValueDefinition.name)
-            .build()
-        )
-      }
+      enumValueTypeSpecBuilder.addAnnotation(
+        AnnotationSpec.builder(SerialName::class.java)
+          .addMember("%S", enumValueDefinition.name)
+          .build()
+      )
     }
     enumTypeSpecBuilder.addEnumConstant(enumName, enumValueTypeSpecBuilder.build())
   }
@@ -83,11 +72,8 @@ internal fun generateGraphQLEnumTypeSpec(
         "%L",
         "This is a default enum value that will be used when attempting to deserialize unknown value.",
       )
-  if (context.serializer == GraphQLSerializer.JACKSON) {
-    unknownTypeSpec.addAnnotation(JsonEnumDefaultValue::class)
-  } else {
-    enumTypeSpecBuilder.addAnnotation(Serializable::class)
-  }
+
+  enumTypeSpecBuilder.addAnnotation(Serializable::class)
 
   enumTypeSpecBuilder.addEnumConstant(UNKNOWN_VALUE, unknownTypeSpec.build())
 

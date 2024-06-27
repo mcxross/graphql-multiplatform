@@ -16,7 +16,6 @@
 
 package xyz.mcxross.graphql.plugin.gradle.client.generator.types
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
@@ -38,7 +37,6 @@ import graphql.language.Type
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.client.generator.ScalarConverterInfo
 
 /**
@@ -58,9 +56,7 @@ internal fun generateGraphQLInputObjectTypeSpec(
     inputObjectTypeSpecBuilder.addKdoc("%L", kdoc)
   }
 
-  if (context.serializer == GraphQLSerializer.KOTLINX) {
-    inputObjectTypeSpecBuilder.addAnnotation(Serializable::class)
-  }
+  inputObjectTypeSpecBuilder.addAnnotation(Serializable::class)
 
   val constructorBuilder = FunSpec.constructorBuilder()
   inputObjectDefinition.inputValueDefinitions.forEach { fieldDefinition ->
@@ -92,13 +88,8 @@ internal fun shouldWrapInOptional(type: TypeName, context: GraphQLClientGenerato
   type.isNullable && context.useOptionalInputWrapper
 
 internal fun TypeName.wrapOptionalInputType(context: GraphQLClientGeneratorContext): TypeName =
-  if (context.serializer == GraphQLSerializer.JACKSON) {
-    ClassName("xyz.mcxross.graphql.client.jackson.types", "OptionalInput")
-      .parameterizedBy(this.copy(nullable = false))
-  } else {
-    ClassName("xyz.mcxross.graphql.client.serialization.types", "OptionalInput")
-      .parameterizedBy(this.copy(nullable = false))
-  }
+  ClassName("xyz.mcxross.graphql.client.serialization.types", "OptionalInput")
+    .parameterizedBy(this.copy(nullable = false))
 
 internal fun createInputPropertySpec(
   context: GraphQLClientGeneratorContext,
@@ -124,11 +115,7 @@ internal fun createInputPropertySpec(
 
   val inputFieldType =
     if (shouldWrapInOptional) {
-      if (context.serializer == GraphQLSerializer.KOTLINX) {
-        kotlinFieldTypeName.copy(annotations = scalarAnnotations).wrapOptionalInputType(context)
-      } else {
-        kotlinFieldTypeName.wrapOptionalInputType(context)
-      }
+      kotlinFieldTypeName.copy(annotations = scalarAnnotations).wrapOptionalInputType(context)
     } else {
       kotlinFieldTypeName
     }
@@ -142,84 +129,54 @@ internal fun createInputPropertySpec(
         }
 
         if (shouldWrapInOptional) {
-          context.requireOptionalSerializer =
-            context.requireOptionalSerializer ||
-              context.serializer == GraphQLSerializer.KOTLINX ||
-              isCustomScalar
+          context.requireOptionalSerializer = context.requireOptionalSerializer || isCustomScalar
 
-          if (context.serializer == GraphQLSerializer.JACKSON) {
+          if (!isCustomScalar) {
             builder.addAnnotations(scalarAnnotations)
-            // all custom scalars are defined globally, so we can generate the jackson serializer
-            // just once
-            context.optionalSerializers.computeIfAbsent(
+          }
+
+          val customSerializerInfo =
+            context.scalarClassToConverterTypeSpecs[rawType]
+              as? ScalarConverterInfo.KotlinxSerializerInfo
+          val optionalSerializerClassName =
+            if (isList && isScalar) {
               ClassName(
-                "${context.packageName}.scalars",
-                OPTIONAL_SCALAR_INPUT_JACKSON_SERIALIZER_NAME,
+                "xyz.mcxross.graphql.client.serialization.serializers",
+                "OptionalScalarListSerializer",
               )
-            ) {
-              generateJacksonOptionalInputScalarSerializer(context.customScalarMap.values)
-            }
-          }
-
-          if (context.serializer == GraphQLSerializer.KOTLINX) {
-            if (!isCustomScalar) {
-              builder.addAnnotations(scalarAnnotations)
-            }
-
-            val customSerializerInfo =
-              context.scalarClassToConverterTypeSpecs[rawType]
-                as? ScalarConverterInfo.KotlinxSerializerInfo
-            val optionalSerializerClassName =
-              if (isList && isScalar) {
-                ClassName(
-                  "xyz.mcxross.graphql.client.serialization.serializers",
-                  "OptionalScalarListSerializer",
-                )
-              } else if (isScalar) {
-                ClassName(
-                  "xyz.mcxross.graphql.client.serialization.serializers",
-                  "OptionalScalarSerializer",
-                )
-              } else {
-                val elementName = (rawType as ClassName).simpleName
-                val className =
-                  if (isList) {
-                    ClassName(
-                      "${context.packageName}.scalars",
-                      "Optional${elementName}ListSerializer",
-                    )
-                  } else {
-                    ClassName("${context.packageName}.scalars", "Optional${elementName}Serializer")
-                  }
-                context.optionalSerializers.computeIfAbsent(className) {
-                  generateKotlinxOptionalInputSerializer(
-                    rawType,
-                    className.simpleName,
-                    customSerializerInfo?.serializerClassName,
-                    isList,
+            } else if (isScalar) {
+              ClassName(
+                "xyz.mcxross.graphql.client.serialization.serializers",
+                "OptionalScalarSerializer",
+              )
+            } else {
+              val elementName = (rawType as ClassName).simpleName
+              val className =
+                if (isList) {
+                  ClassName(
+                    "${context.packageName}.scalars",
+                    "Optional${elementName}ListSerializer",
                   )
+                } else {
+                  ClassName("${context.packageName}.scalars", "Optional${elementName}Serializer")
                 }
-                className
+              context.optionalSerializers.computeIfAbsent(className) {
+                generateKotlinxOptionalInputSerializer(
+                  rawType,
+                  className.simpleName,
+                  customSerializerInfo?.serializerClassName,
+                  isList,
+                )
               }
-            builder.addAnnotation(
-              AnnotationSpec.builder(Serializable::class)
-                .addMember("with = %T::class", optionalSerializerClassName)
-                .build()
-            )
-          }
-        } else {
-          builder.addAnnotations(scalarAnnotations)
-        }
-
-        if (context.serializer == GraphQLSerializer.JACKSON) {
-          // always add @get:JsonProperty annotation as a workaround to Jackson limitations
-          // related to JavaBean naming conventions
+              className
+            }
           builder.addAnnotation(
-            AnnotationSpec.builder(JsonProperty::class)
-              .useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
-              .addMember("value = \"$graphqlFieldName\"")
+            AnnotationSpec.builder(Serializable::class)
+              .addMember("with = %T::class", optionalSerializerClassName)
               .build()
           )
+        } else {
+          builder.addAnnotations(scalarAnnotations)
         }
       }
       .build()
@@ -234,17 +191,10 @@ internal fun createInputPropertySpec(
 
 internal fun nullableDefaultValueCodeBlock(context: GraphQLClientGeneratorContext): CodeBlock =
   if (context.useOptionalInputWrapper) {
-    if (context.serializer == GraphQLSerializer.JACKSON) {
-      CodeBlock.of(
-        "%M",
-        MemberName("xyz.mcxross.graphql.client.jackson.types", "OptionalInput.Undefined"),
-      )
-    } else {
-      CodeBlock.of(
-        "%M",
-        MemberName("xyz.mcxross.graphql.client.serialization.types", "OptionalInput.Undefined"),
-      )
-    }
+    CodeBlock.of(
+      "%M",
+      MemberName("xyz.mcxross.graphql.client.serialization.types", "OptionalInput.Undefined"),
+    )
   } else {
     CodeBlock.of("null")
   }

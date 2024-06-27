@@ -16,15 +16,13 @@
 
 package xyz.mcxross.graphql.plugin.gradle
 
-import java.io.File
 import org.gradle.api.Action
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLParserOptions
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLScalar
-import xyz.mcxross.graphql.plugin.gradle.config.GraphQLSerializer
 import xyz.mcxross.graphql.plugin.gradle.config.TimeoutConfiguration
+import java.io.File
 
 /** GraphQL Kotlin Gradle Plugin extension. */
-@Suppress("UnstableApiUsage")
 open class GraphQLPluginExtension {
 
   private var clientExtensionConfigured: Boolean = false
@@ -93,8 +91,6 @@ open class GraphQLPluginClientExtension {
   var queryFiles: List<File> = emptyList()
   /** Directory containing GraphQL query files. */
   var queryFileDirectory: String? = null
-  /** JSON serializer that will be used to generate the data classes. */
-  var serializer: GraphQLSerializer = GraphQLSerializer.JACKSON
   /**
    * Opt-in flag to wrap nullable arguments in OptionalInput that supports both null and undefined.
    */

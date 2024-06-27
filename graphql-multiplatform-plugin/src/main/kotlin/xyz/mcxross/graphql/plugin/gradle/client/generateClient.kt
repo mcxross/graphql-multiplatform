@@ -17,34 +17,13 @@
 package xyz.mcxross.graphql.plugin.gradle.client
 
 import com.squareup.kotlinpoet.FileSpec
-import graphql.parser.ParserOptions
 import java.io.File
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGenerator
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorConfig
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLScalar
-import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLSerializer
 
 /** Generate GraphQL client data classes from specified queries and target schema. */
 fun generateClient(
-  packageName: String,
-  allowDeprecated: Boolean = false,
-  customScalarsMap: List<GraphQLScalar> = emptyList(),
-  serializer: GraphQLSerializer = GraphQLSerializer.JACKSON,
+  config: GraphQLClientGeneratorConfig,
   schemaPath: String,
   queries: List<File>,
-  useOptionalInputWrapper: Boolean = false,
-  parserOptions: ParserOptions.Builder.() -> Unit = {},
-): List<FileSpec> {
-  val customScalars = customScalarsMap.associateBy { it.scalar }
-  val config =
-    GraphQLClientGeneratorConfig(
-      packageName = packageName,
-      allowDeprecated = allowDeprecated,
-      customScalarMap = customScalars,
-      serializer = serializer,
-      useOptionalInputWrapper = useOptionalInputWrapper,
-      parserOptions = parserOptions,
-    )
-  val generator = GraphQLClientGenerator(schemaPath, config)
-  return generator.generate(queries)
-}
+): List<FileSpec> = GraphQLClientGenerator(schemaPath, config).generate(queries)
