@@ -31,10 +31,10 @@ import graphql.parser.Parser
 import graphql.parser.ParserOptions
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
+import kotlinx.serialization.Contextual
 import java.io.File
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.LongAsStringSerializer
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.MultipleOperationsInFileException
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.SchemaUnavailableException
@@ -55,7 +55,8 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
   private val sharedTypes: MutableMap<ClassName, List<TypeSpec>> = mutableMapOf()
   private var generateOptionalSerializer: Boolean = false
   private val graphQLSchema: TypeDefinitionRegistry
-  private val parserOptions: ParserOptions = ParserOptions.newParserOptions().also { this.config.parserOptions(it) }.build()
+  private val parserOptions: ParserOptions =
+    ParserOptions.newParserOptions().also { this.config.parserOptions(it) }.build()
 
   init {
     graphQLSchema = parseSchema(schemaPath)
@@ -173,6 +174,13 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         val constructor =
           FunSpec.constructorBuilder().addParameter("variables", variablesClassName).build()
         operationTypeSpec.primaryConstructor(constructor)
+      } else {
+        operationTypeSpec.addProperty(
+          PropertySpec.builder("variables", ClassName("kotlin", "Any").copy(nullable = true) , KModifier.OVERRIDE)
+            .initializer("null")
+            .addAnnotation(Contextual::class)
+            .build()
+        )
       }
 
       /*val parameterizedReturnType =
@@ -200,7 +208,8 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         fileSpecs.add(polymorphicTypeSpec.build())
       }
       context.typeSpecs.minus(polymorphicTypes).forEach { (className, typeSpec) ->
-        val outputTypeFileSpec = FileSpec.builder(className.packageName, className.simpleName).addType(typeSpec).build()
+        val outputTypeFileSpec =
+          FileSpec.builder(className.packageName, className.simpleName).addType(typeSpec).build()
         fileSpecs.add(outputTypeFileSpec)
       }
       operationFileSpec.addType(operationTypeSpec.build())

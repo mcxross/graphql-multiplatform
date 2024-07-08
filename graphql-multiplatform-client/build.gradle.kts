@@ -1,18 +1,19 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.dokka.gradle.DokkaTask
-import java.util.*
 
 plugins {
-  id("com.android.library")
-  kotlin("multiplatform")
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.dokka)
   alias(libs.plugins.kotlin.serialization)
-  id("maven-publish")
-  id("signing")
+  alias(libs.plugins.vanniktech.maven.publish)
 }
 
 group = "xyz.mcxross.graphql.client"
 
-version = "0.1.0-beta05"
+version = "0.1.0-beta06"
 
 extra["isReleaseVersion"] = !version.toString().endsWith("-SNAPSHOT")
 
@@ -80,7 +81,7 @@ kotlin {
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 
 android {
-  namespace = "mcxross.graphql"
+  namespace = "xyz.mcxross.graphql.client"
   defaultConfig {
     minSdk = 24
     compileSdk = 33
@@ -94,53 +95,6 @@ android {
   }
 }
 
-ext["sonatypeUser"] = null
-
-ext["sonatypePass"] = null
-
-ext["signing.secretKeyRingFile"] = null
-
-ext["signing.password"] = null
-
-ext["signing.keyId"] = null
-
-ext["keyId"] = null
-
-ext["keyPassword"] = null
-
-ext["signingKey"] = null
-
-val secretPropsFile = project.rootProject.file("local.properties")
-
-fun getProperty(name: String): String? {
-  return System.getenv(name) ?: project.findProperty(name) as String?
-}
-
-fun extraProperty(name: String): String {
-  return extra[name] as String
-}
-
-fun isFilePathProperty(name: String): Boolean {
-  return getProperty(name)?.let { File(it).exists() } ?: false
-}
-
-fun loadFileContents(name: String): String {
-  return getProperty(name)?.let { File(it).readText() } ?: ""
-}
-
-if (secretPropsFile.exists()) {
-  secretPropsFile
-    .reader()
-    .use { Properties().apply { load(it) } }
-    .onEach { (name, value) -> ext[name.toString()] = value }
-} else {
-  ext["sonatypeUser"] = getProperty("OSSRH_USERNAME")
-  ext["sonatypePass"] = getProperty("OSSRH_PASSWORD")
-  ext["keyId"] = getProperty("GPG_KEY_ID")
-  ext["keyPassword"] = getProperty("GPG_KEY_PASSWORD")
-  ext["signingKey"] = getProperty("SIGNING_KEY")
-}
-
 tasks.getByName<DokkaTask>("dokkaHtml") {
   moduleName.set("GraphQL Multiplatform Client")
   outputDirectory.set(file(buildDir.resolve("dokka")))
@@ -150,65 +104,47 @@ tasks.withType<DokkaTask>().configureEach {
   notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/2231")
 }
 
-val javadocJar =
-  tasks.register<Jar>("javadocJar") {
-    archiveClassifier.set("javadoc")
-    dependsOn("dokkaHtml")
-    from(buildDir.resolve("dokka"))
-  }
+mavenPublishing {
+  coordinates("xyz.mcxross.graphql.client", "graphql-multiplatform-client", version.toString())
 
-val signingTasks = tasks.withType<Sign>()
-tasks.withType<AbstractPublishToMaven>().configureEach {
-  dependsOn(signingTasks)
-}
-publishing {
-  if (hasProperty("sonatypeUser") && hasProperty("sonatypePass")) {
-    repositories {
-      maven {
-        name = "sonatype"
-        val isSnapshot = version.toString().endsWith("-SNAPSHOT")
-        setUrl(
-          if (isSnapshot) {
-            "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-          } else {
-            "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-          }
-        )
-        credentials {
-          username = extraProperty("sonatypeUser")
-          password = extraProperty("sonatypePass")
-        }
+  configure(
+    KotlinMultiplatform(
+      javadocJar = JavadocJar.Dokka("dokkaHtml"),
+      sourcesJar = true,
+      androidVariantsToPublish = listOf("debug", "release"),
+    )
+  )
+
+  pom {
+    name.set("GraphQL Multiplatform Client")
+    description.set(
+      "A multiplatform GraphQL client for Kotlin, supporting Android, iOS, macOS, tvOS, watchOS, Linux, Windows, and the web."
+    )
+    inceptionYear.set("2023")
+    url.set("https://github.com/mcxross")
+    licenses {
+      license {
+        name.set("The Apache License, Version 2.0")
+        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+        distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
       }
+    }
+    developers {
+      developer {
+        id.set("mcxross")
+        name.set("Mcxross")
+        email.set("oss@mcxross.xyz")
+        url.set("https://mcxross.xyz/")
+      }
+    }
+    scm {
+      url.set("https://github.com/mcxross/graphql-multiplatform")
+      connection.set("scm:git:ssh://github.com/mcxross/graphql-multiplatform.git")
+      developerConnection.set("scm:git:ssh://github.com/mcxross/graphql-multiplatform.git")
     }
   }
 
-  publications.withType<MavenPublication> {
-    artifact(javadocJar.get())
-    pom {
-      name.set("GraphQL Multiplatform Client")
-      description.set(
-        "A multiplatform GraphQL client for Kotlin, supporting Android, iOS, macOS, tvOS, watchOS, Linux, Windows, and the web."
-      )
-      url.set("https://github.com/mcxross")
+  publishToMavenCentral(SonatypeHost.S01, automaticRelease = true)
 
-      licenses {
-        license {
-          name.set("Apache License, Version 2.0")
-          url.set("https://opensource.org/licenses/APACHE-2.0")
-        }
-      }
-      developers {
-        developer {
-          id.set("mcxross")
-          name.set("Mcxross")
-          email.set("oss@mcxross.xyz")
-        }
-      }
-      scm { url.set("https://github.com/mcxross/graphql-multiplatform") }
-    }
-  }
-}
-
-tasks.withType<Sign>().configureEach {
-  onlyIf("isReleaseVersion is set") { project.extra["isReleaseVersion"] as Boolean }
+  signAllPublications()
 }

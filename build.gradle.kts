@@ -1,16 +1,14 @@
 extra["isReleaseVersion"] = !version.toString().endsWith("SNAPSHOT")
 
 plugins {
-    kotlin("multiplatform") apply false
-    kotlin("jvm") apply false
-    kotlin("plugin.serialization") apply false
-    kotlin("android") apply false
-    id("com.android.application") apply false
-    id("com.android.library") apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.application) apply false
 }
 
 group = "xyz.mcxross.graphql"
-version = "0.1.0-beta05"
+version = "0.1.0-beta06"
 
 allprojects {
     repositories {

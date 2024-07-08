@@ -8,8 +8,8 @@ Significant changes have been made to the original library to make it work on Ko
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.23-B125EA?logo=kotlin)](https://kotlinlang.org)
 
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-v1.9.23-B125EA?logo=kotlin)](https://kotlinlang.org)
-[![Maven Central](https://img.shields.io/maven-central/v/com.apurebase/graphql-kotlin-multiplatform)](https://search.maven.org/artifact/com.apurebase/graphql-kotlin-multiplatform)
-
+![Version](https://img.shields.io/badge/Version-0.1.0--beta06-blue.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/xyz.mcxross.graphql.client/graphql-multiplatform-client)](https://central.sonatype.com/artifact/xyz.mcxross.graphql.client/graphql-multiplatform-client)
 ![badge-android](http://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android)
 ![badge-ios](http://img.shields.io/badge/Platform-iOS-orange.svg?logo=apple)
 ![badge-js](http://img.shields.io/badge/Platform-NodeJS-yellow.svg?logo=javascript)
@@ -64,7 +64,6 @@ graphql {
   client {
     endpoint = "https://api.example.com/graphql"
     packageName = "com.example.graphql"
-    serializer = GraphQLSerializer.KOTLINX
   }
 }
 ```
