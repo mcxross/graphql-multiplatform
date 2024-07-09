@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "xyz.mcxross.graphql"
-version = "0.1.0-beta06"
+version = "0.1.0-beta07"
 
 allprojects {
     repositories {

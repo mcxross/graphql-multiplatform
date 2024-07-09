@@ -64,7 +64,7 @@ val generateDefaultVersion by
       defaultVersionFile.writeText(
         """
         package xyz.mcxross.graphql.plugin.gradle
-        internal const val DEFAULT_PLUGIN_VERSION = "0.1.0-beta06"
+        internal const val DEFAULT_PLUGIN_VERSION = "0.1.0-beta07"
     """.trimIndent()
       )
     }
