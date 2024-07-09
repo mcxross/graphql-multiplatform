@@ -26,5 +26,5 @@ abstract class GraphQLClientRequest<T : Any> {
   abstract val query: String?
   abstract val operationName: String?
   abstract val variables: Any?
-  //abstract val extensions: Map<String, Any>?
+  // abstract val extensions: Map<String, Any>?
 }

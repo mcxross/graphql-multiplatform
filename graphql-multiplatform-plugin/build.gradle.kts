@@ -51,10 +51,10 @@ gradlePlugin {
 }
 
 val generateDefaultVersion by
-    tasks.registering {
-      val fileName = "PluginVersion.kt"
-      val defaultVersionFile =
-          File("$buildDir/generated/src/xyz/mcxross/graphql/plugin/gradle", fileName)
+  tasks.registering {
+    val fileName = "PluginVersion.kt"
+    val defaultVersionFile =
+      File("$buildDir/generated/src/xyz/mcxross/graphql/plugin/gradle", fileName)
 
     inputs.property(fileName, project.version)
     outputs.dir(defaultVersionFile.parent)
@@ -65,7 +65,8 @@ val generateDefaultVersion by
         """
         package xyz.mcxross.graphql.plugin.gradle
         internal const val DEFAULT_PLUGIN_VERSION = "0.1.0-beta07"
-    """.trimIndent()
+    """
+          .trimIndent()
       )
     }
   }

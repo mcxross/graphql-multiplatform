@@ -23,7 +23,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-
 /**
  * Default HTTP client for Linux platform. Uses Curl as the underlying HTTP client implementation.
  */

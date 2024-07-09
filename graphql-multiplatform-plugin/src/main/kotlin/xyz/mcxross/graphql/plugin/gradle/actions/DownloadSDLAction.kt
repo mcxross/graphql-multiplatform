@@ -16,24 +16,25 @@
 
 package xyz.mcxross.graphql.plugin.gradle.actions
 
+import org.gradle.workers.WorkAction
 import xyz.mcxross.graphql.plugin.gradle.client.downloadSchema
 import xyz.mcxross.graphql.plugin.gradle.parameters.RetrieveSchemaParameters
-import org.gradle.workers.WorkAction
 
 /**
  * WorkAction that is used to download GraphQL schema in SDL format from a target endpoint.
  *
- * Action is run using Gradle classloader isolation with a custom classpath that has a dependency on `graphql-kotlin-client-generator`.
+ * Action is run using Gradle classloader isolation with a custom classpath that has a dependency on
+ * `graphql-kotlin-client-generator`.
  */
 abstract class DownloadSDLAction : WorkAction<RetrieveSchemaParameters> {
 
-    override fun execute() {
-        val endpoint = parameters.endpoint.get()
-        val headers = parameters.headers.get()
-        val timeout = parameters.timeoutConfiguration.get()
-        val schemaFile = parameters.schemaFile.get()
+  override fun execute() {
+    val endpoint = parameters.endpoint.get()
+    val headers = parameters.headers.get()
+    val timeout = parameters.timeoutConfiguration.get()
+    val schemaFile = parameters.schemaFile.get()
 
-        val schema = downloadSchema(endpoint, headers, timeout.connect, timeout.read)
-        schemaFile.writeText(schema)
-    }
+    val schema = downloadSchema(endpoint, headers, timeout.connect, timeout.read)
+    schemaFile.writeText(schema)
+  }
 }

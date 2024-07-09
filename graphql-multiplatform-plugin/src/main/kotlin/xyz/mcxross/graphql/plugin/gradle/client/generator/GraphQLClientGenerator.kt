@@ -31,8 +31,8 @@ import graphql.parser.Parser
 import graphql.parser.ParserOptions
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
-import kotlinx.serialization.Contextual
 import java.io.File
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.client.Generated
@@ -176,7 +176,11 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         operationTypeSpec.primaryConstructor(constructor)
       } else {
         operationTypeSpec.addProperty(
-          PropertySpec.builder("variables", ClassName("kotlin", "Any").copy(nullable = true) , KModifier.OVERRIDE)
+          PropertySpec.builder(
+              "variables",
+              ClassName("kotlin", "Any").copy(nullable = true),
+              KModifier.OVERRIDE,
+            )
             .initializer("null")
             .addAnnotation(Contextual::class)
             .build()

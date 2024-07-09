@@ -16,12 +16,12 @@
 
 package xyz.mcxross.graphql.plugin.gradle.parameters
 
+import java.io.File
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkParameters
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLParserOptions
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLScalar
-import java.io.File
 
 /** WorkParameters used for generating GraphQL HTTP client. */
 interface GenerateClientParameters : WorkParameters {

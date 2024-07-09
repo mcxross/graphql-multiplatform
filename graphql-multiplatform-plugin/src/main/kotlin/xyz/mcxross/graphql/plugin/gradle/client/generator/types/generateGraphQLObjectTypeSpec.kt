@@ -26,7 +26,6 @@ import graphql.language.FragmentSpread
 import graphql.language.ObjectTypeDefinition
 import graphql.language.SelectionSet
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.LongAsStringSerializer
 import xyz.mcxross.graphql.client.Generated
 import xyz.mcxross.graphql.plugin.gradle.client.generator.GraphQLClientGeneratorContext
 import xyz.mcxross.graphql.plugin.gradle.client.generator.exceptions.InvalidSelectionSetException

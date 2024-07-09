@@ -21,7 +21,7 @@ import xyz.mcxross.graphql.client.serializer.AnyKSerializer
 
 @Serializable
 data class KotlinxGraphQLResponse<T>(
-   val data: T? = null,
-   val errors: List<KotlinxGraphQLError>? = null,
-   val extensions: Map<String, @Serializable(with = AnyKSerializer::class) Any?>? = null,
+  val data: T? = null,
+  val errors: List<KotlinxGraphQLError>? = null,
+  val extensions: Map<String, @Serializable(with = AnyKSerializer::class) Any?>? = null,
 )

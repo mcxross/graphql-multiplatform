@@ -16,6 +16,8 @@
 
 package xyz.mcxross.graphql.plugin.gradle.tasks
 
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -37,10 +39,6 @@ import org.gradle.workers.WorkerExecutor
 import xyz.mcxross.graphql.plugin.gradle.actions.GenerateClientAction
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLParserOptions
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLScalar
-import java.io.File
-import javax.inject.Inject
-
-
 
 /**
  * Generate GraphQL Kotlin client and corresponding data classes based on the provided GraphQL

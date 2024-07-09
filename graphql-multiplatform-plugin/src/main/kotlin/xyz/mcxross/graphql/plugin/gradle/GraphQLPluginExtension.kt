@@ -16,11 +16,11 @@
 
 package xyz.mcxross.graphql.plugin.gradle
 
+import java.io.File
 import org.gradle.api.Action
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLParserOptions
 import xyz.mcxross.graphql.plugin.gradle.config.GraphQLScalar
 import xyz.mcxross.graphql.plugin.gradle.config.TimeoutConfiguration
-import java.io.File
 
 /** GraphQL Kotlin Gradle Plugin extension. */
 open class GraphQLPluginExtension {

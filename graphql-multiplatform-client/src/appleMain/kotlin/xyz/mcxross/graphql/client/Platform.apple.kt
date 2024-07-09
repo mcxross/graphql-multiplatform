@@ -24,8 +24,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 /**
- * Default HTTP client for Apple platform. Uses Darwin as the underlying HTTP client
- * implementation.
+ * Default HTTP client for Apple platform. Uses Darwin as the underlying HTTP client implementation.
  */
 actual fun httpClient() =
   HttpClient(Darwin) {
