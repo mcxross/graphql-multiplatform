@@ -23,13 +23,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-/**
- * Default HTTP client for Js platform. Uses Js as the underlying HTTP client
- * implementation.
- */
-actual fun httpClient(
-  engine: HttpClientEngine?,
-) =
+/** Default HTTP client for Js platform. Uses Js as the underlying HTTP client implementation. */
+actual fun httpClient() =
   HttpClient(Js) {
     // Set the content negotiation. This is required for the client to know how to handle JSON.
     install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }

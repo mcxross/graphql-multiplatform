@@ -28,5 +28,5 @@ import kotlinx.serialization.json.Json
  * Default HTTP client for Android platform. Uses OkHttp as the underlying HTTP client
  * implementation.
  */
-actual fun httpClient(engine: HttpClientEngine?) =
+actual fun httpClient() =
   HttpClient(OkHttp) { install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) } }

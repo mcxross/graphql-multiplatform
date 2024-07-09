@@ -25,7 +25,6 @@ import io.ktor.client.engine.*
  * Each client is platform-specific with a different engine. Each engine has its own configuration
  * options.
  */
-expect fun httpClient(engine: HttpClientEngine? = null): HttpClient
-
+expect fun httpClient(): HttpClient
 
 val client = httpClient()

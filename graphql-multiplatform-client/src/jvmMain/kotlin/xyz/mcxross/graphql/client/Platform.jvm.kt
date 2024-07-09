@@ -24,7 +24,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 /** Default HTTP client for JVM platform. Uses CIO as the underlying HTTP client implementation. */
-actual fun httpClient(engine: HttpClientEngine?) =
+actual fun httpClient() =
   HttpClient(CIO) {
     // Set the content negotiation. This is required for the client to know how to handle JSON.
     install(ContentNegotiation) {
