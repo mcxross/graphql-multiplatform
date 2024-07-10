@@ -187,15 +187,6 @@ class GraphQLClientGenerator(schemaPath: String, private val config: GraphQLClie
         )
       }
 
-      /*val parameterizedReturnType =
-        ClassName("kotlin.reflect", "KClass").parameterizedBy(kotlinResultTypeName)
-      operationTypeSpec.addFunction(
-        FunSpec.builder("responseType")
-          .addModifiers(KModifier.OVERRIDE)
-          .returns(parameterizedReturnType)
-          .addStatement("return %T::class", kotlinResultTypeName)
-          .build()
-      )*/
       operationTypeSpec.addType(graphQLResponseTypeSpec)
 
       val polymorphicTypes = mutableListOf<ClassName>()

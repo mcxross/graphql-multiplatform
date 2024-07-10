@@ -204,25 +204,21 @@ class GraphQLGradlePlugin : Plugin<Project> {
       clientGeneratingTaskNames.add(generateClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateClientTask.pluginClasspath.setFrom(configuration)
-      // if (!isAndroidProject) {
       configureDefaultProjectSourceSet(
         project = project,
         outputDirectory = generateClientTask.outputDirectory,
       )
-      // }
     }
     project.tasks.withType(GraphQLGenerateTestClientTask::class.java).configureEach {
       generateTestClientTask ->
       testClientGeneratingTaskNames.add(generateTestClientTask)
       val configuration = project.configurations.getAt(GENERATE_CLIENT_CONFIGURATION)
       generateTestClientTask.pluginClasspath.setFrom(configuration)
-      // if (!isAndroidProject) {
       configureDefaultProjectSourceSet(
         project = project,
         outputDirectory = generateTestClientTask.outputDirectory,
         targetSourceSet = "commonTest",
       )
-      // }
     }
     project.tasks.withType(GraphQLIntrospectSchemaTask::class.java).configureEach {
       introspectionTask ->
@@ -248,16 +244,6 @@ class GraphQLGradlePlugin : Plugin<Project> {
       }
     }
 
-    /*if (isAndroidProject) {
-      // Android plugins are eagerly configured so just adding the tasks outputs to the source set
-      // is not enough,
-      // we also need to explicitly configure compile dependencies
-      configureAndroidCompileTasks(
-        project,
-        clientGeneratingTaskNames,
-        testClientGeneratingTaskNames,
-      )
-    }*/
   }
 
   private fun configureDefaultProjectSourceSet(
