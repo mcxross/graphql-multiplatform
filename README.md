@@ -72,6 +72,13 @@ graphql {
 }
 ```
 
+The plugin will add a `generateClient` task to your project. Running this task will generate the client code in the package
+specified in the `packageName` property.
+
+```shell
+./gradlew generateClient
+```
+
 ## What's included
 
 - `Client` - A multiplatform GraphQL client that allows you to interact with a GraphQL server
