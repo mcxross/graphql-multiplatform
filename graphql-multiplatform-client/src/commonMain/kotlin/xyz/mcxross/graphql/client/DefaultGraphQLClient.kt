@@ -24,8 +24,10 @@ package xyz.mcxross.graphql.client
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.errors.*
 import xyz.mcxross.graphql.client.core.client
 import xyz.mcxross.graphql.client.types.GraphQLClient
 import xyz.mcxross.graphql.client.types.GraphQLClientRequest
@@ -37,14 +39,28 @@ open class DefaultGraphQLClient(val url: String) : GraphQLClient<HttpRequestBuil
   suspend inline fun <reified T : Any> execute(
     request: GraphQLClientRequest<T>
   ): KotlinxGraphQLResponse<T> {
-    val rawResult =
-      client.post(url) {
-        contentType(ContentType.Application.Json)
-        expectSuccess = true
-        setBody(request)
-      }
+    return try {
+      val rawResult: HttpResponse =
+        client.post(url) {
+          contentType(ContentType.Application.Json)
+          expectSuccess = true
+          setBody(request)
+        }
 
-    return rawResult.body()
+      if (rawResult.status.isSuccess()) {
+        rawResult.body()
+      } else {
+        throw Exception("HTTP error: ${rawResult.status}")
+      }
+    } catch (e: ClientRequestException) {
+      throw e
+    } catch (e: ServerResponseException) {
+      throw e
+    } catch (e: IOException) {
+      throw e
+    } catch (e: Exception) {
+      throw e
+    }
   }
 
   override fun close() {
