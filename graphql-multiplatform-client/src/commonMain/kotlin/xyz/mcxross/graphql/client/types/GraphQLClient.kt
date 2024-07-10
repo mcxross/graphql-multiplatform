@@ -17,21 +17,4 @@
 package xyz.mcxross.graphql.client.types
 
 /** A lightweight typesafe GraphQL HTTP client. */
-interface GraphQLClient<RequestCustomizer> {
-  val automaticPersistedQueriesSettings: AutomaticPersistedQueriesSettings
-
-  /** Executes [GraphQLClientRequest] and returns corresponding [GraphQLClientResponse]. */
-  suspend fun <T : Any> execute(
-    request: GraphQLClientRequest<T>,
-    requestCustomizer: RequestCustomizer.() -> Unit = {},
-  ): GraphQLClientResponse<T>
-
-  /**
-   * Executes batch requests that contains a number of [GraphQLClientRequest]s and returns a list of
-   * corresponding [GraphQLClientResponse]s.
-   */
-  suspend fun execute(
-    requests: List<GraphQLClientRequest<*>>,
-    requestCustomizer: RequestCustomizer.() -> Unit = {},
-  ): List<GraphQLClientResponse<*>>
-}
+interface GraphQLClient<RequestCustomizer>
