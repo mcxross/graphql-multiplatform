@@ -17,6 +17,7 @@
 package xyz.mcxross.graphql.client.types
 
 import kotlinx.serialization.Serializable
+import xyz.mcxross.graphql.client.exception.GraphQLClientError
 
 /**
  * GraphQL response that is spec complaint with serialization and deserialization.

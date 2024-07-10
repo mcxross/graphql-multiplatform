@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package xyz.mcxross.graphql.client.types
+package xyz.mcxross.graphql.client.exception
+
+import xyz.mcxross.graphql.client.types.GraphQLClientSourceLocation
 
 /**
  * GraphQL error representation that is spec complaint with serialization and deserialization.

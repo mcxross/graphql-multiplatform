@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package xyz.mcxross.graphql.client
+package xyz.mcxross.graphql.client.core
 
 import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.darwin.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-/**
- * Default HTTP client for Apple platform. Uses Darwin as the underlying HTTP client implementation.
- */
+/** Default HTTP client for JVM platform. Uses CIO as the underlying HTTP client implementation. */
 actual fun httpClient() =
-  HttpClient(Darwin) {
+  HttpClient(CIO) {
     // Set the content negotiation. This is required for the client to know how to handle JSON.
-    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+    install(ContentNegotiation) {
+      json(
+        Json {
+          ignoreUnknownKeys = true
+          classDiscriminator = "__typename"
+        }
+      )
+    }
   }

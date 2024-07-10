@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package xyz.mcxross.graphql.client
+package xyz.mcxross.graphql.client.core
 
 import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.curl.*
+import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-/**
- * Default HTTP client for Linux platform. Uses Curl as the underlying HTTP client implementation.
- */
+/** Default HTTP client for Js platform. Uses Js as the underlying HTTP client implementation. */
 actual fun httpClient() =
-  HttpClient(Curl) {
+  HttpClient(Js) {
     // Set the content negotiation. This is required for the client to know how to handle JSON.
     install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
   }

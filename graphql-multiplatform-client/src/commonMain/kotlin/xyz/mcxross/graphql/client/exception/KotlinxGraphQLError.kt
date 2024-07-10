@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package xyz.mcxross.graphql.client.types
+package xyz.mcxross.graphql.client.exception
 
 import kotlinx.serialization.Serializable
 import xyz.mcxross.graphql.client.serializer.AnyKSerializer
 import xyz.mcxross.graphql.client.serializer.GraphQLErrorPathSerializer
+import xyz.mcxross.graphql.client.types.KotlinxGraphQLSourceLocation
 
 @Serializable
 data class KotlinxGraphQLError(

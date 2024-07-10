@@ -17,11 +17,12 @@
 package xyz.mcxross.graphql.client.types
 
 import kotlinx.serialization.Serializable
+import xyz.mcxross.graphql.client.exception.KotlinxGraphQLError
 import xyz.mcxross.graphql.client.serializer.AnyKSerializer
 
 @Serializable
 data class KotlinxGraphQLResponse<T>(
-  val data: T? = null,
-  val errors: List<KotlinxGraphQLError>? = null,
-  val extensions: Map<String, @Serializable(with = AnyKSerializer::class) Any?>? = null,
+    val data: T? = null,
+    val errors: List<KotlinxGraphQLError>? = null,
+    val extensions: Map<String, @Serializable(with = AnyKSerializer::class) Any?>? = null,
 )
