@@ -1,9 +1,11 @@
 # GraphQL Kotlin Multiplatform
 
-GraphQL Kotlin Multiplatform is a GraphQL client for Kotlin Multiplatform. It is a multiplatform library that allows you to interact with a GraphQL server from Kotlin code.
-It is built on top of [graphql-kotlin](https://github.com/ExpediaGroup/graphql-kotlin). 
+GraphQL Kotlin Multiplatform is a GraphQL client for Kotlin Multiplatform. It is a multiplatform library that allows you
+to interact with a GraphQL server from Kotlin code.
+It is built on top of [graphql-kotlin](https://github.com/ExpediaGroup/graphql-kotlin).
 
-Significant changes have been made to the original library to make it work on Kotlin Multiplatform. This included providing Ktor client support for all platforms and utilization of only multiplatform libraries.
+Significant changes have been made to the original library to make it work on Kotlin Multiplatform. This included
+providing Ktor client support for all platforms and utilization of only multiplatform libraries.
 
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.23-B125EA?logo=kotlin)](https://kotlinlang.org)
 
@@ -36,7 +38,8 @@ Significant changes have been made to the original library to make it work on Ko
 
 ### Installation
 
-GraphQL Multiplatform is available on [Maven Central](https://search.maven.org/artifact/com.apurebase/graphql-kotlin-multiplatform) 
+GraphQL Multiplatform is available
+on [Maven Central](https://search.maven.org/artifact/com.apurebase/graphql-kotlin-multiplatform)
 as a Kotlin Multiplatform library. You can either add it to your multiplatform project as shown below:
 
 ```kotlin
@@ -55,18 +58,19 @@ plugins {
 
 > :warning: **Note:** Currently, only Kotlin Multiplatform projects are supported.
 
-
 ### Usage
+
+Applying the plugin to your project will generate a `graphql` block in your `build.gradle.kts` file. You can configure
+the client by setting the `endpoint` and `packageName` properties.
 
 ```kotlin
 graphql {
-  client {
-    endpoint = "https://api.example.com/graphql"
-    packageName = "com.example.graphql"
-  }
+    client {
+        endpoint = "https://api.example.com/graphql"
+        packageName = "com.example.graphql"
+    }
 }
 ```
-
 
 ## What's included
 
@@ -75,7 +79,8 @@ graphql {
 
 ## Contribution
 
-We welcome contributions to GraphQL Kotlin Multiplatform. Please refer to the [contribution guide](CONTRIBUTING.md) for more information.
+We welcome contributions to GraphQL Kotlin Multiplatform. Please refer to the [contribution guide](CONTRIBUTING.md) for
+more information.
 
 ## License
 
