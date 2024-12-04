@@ -19,5 +19,6 @@ package xyz.mcxross.graphql.client.serializer
 /** Exception thrown when unable to locate the default GraphQL Kotlin client serializer. */
 object MissingDefaultGraphQLClientSerializerException :
   IllegalStateException(
-    "Unable to find default GraphQL Kotlin client serializer. Verify graphql-kotlin-client-jackson or graphql-kotlin-client-serialization is available on the classpath."
+    "Unable to find default GraphQL Kotlin client serializer. Verify graphql-kotlin-client-jackson " +
+      "or graphql-kotlin-client-serialization is available on the classpath.",
   )

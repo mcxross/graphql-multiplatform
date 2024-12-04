@@ -16,10 +16,10 @@
 
 package xyz.mcxross.graphql.client.core
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 /** Default HTTP client for JVM platform. Uses CIO as the underlying HTTP client implementation. */
@@ -31,7 +31,7 @@ actual fun httpClient() =
         Json {
           ignoreUnknownKeys = true
           classDiscriminator = "__typename"
-        }
+        },
       )
     }
   }

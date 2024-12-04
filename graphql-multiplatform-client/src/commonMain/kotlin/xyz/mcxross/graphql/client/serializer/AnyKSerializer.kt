@@ -16,7 +16,8 @@
 
 /*
  * Modifications made:
- * - Kotlin reflection is not supported in Kotlin Multiplatform, so we have replaced the reflection-based serialization with a workaround.
+ * - Kotlin reflection is not supported in Kotlin Multiplatform, so we have replaced the
+ * reflection-based serialization with a workaround.
  *
  */
 
@@ -52,7 +53,7 @@ import xyz.mcxross.graphql.client.types.OptionalInput
  * convert the Strings to appropriate types.
  *
  * @see [issue 296](https://github.com/Kotlin/kotlinx.serialization/issues/296) and
- *   [issue 746](https://github.com/Kotlin/kotlinx.serialization/issues/746)
+ *    [issue 746](https://github.com/Kotlin/kotlinx.serialization/issues/746)
  */
 object AnyKSerializer : KSerializer<Any?> {
   override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Any")
@@ -76,10 +77,12 @@ object AnyKSerializer : KSerializer<Any?> {
             .toMap()
         JsonObject(mapContents)
       }
+
       is List<*> -> {
         val arrayContents = value.mapNotNull { listEntry -> serializeAny(listEntry) }
         JsonArray(arrayContents)
       }
+
       is Number -> JsonPrimitive(value)
       is Boolean -> JsonPrimitive(value)
       is String -> JsonPrimitive(value)
@@ -108,9 +111,11 @@ object AnyKSerializer : KSerializer<Any?> {
       is JsonObject -> {
         element.mapValues { deserializeJsonElement(it.value) }
       }
+
       is JsonArray -> {
         element.map { deserializeJsonElement(it) }
       }
+
       is JsonPrimitive ->
         when {
           element.isString -> element.content

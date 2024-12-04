@@ -16,7 +16,7 @@
 
 package xyz.mcxross.graphql.client.core
 
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 /**
  * Create a new Ktor client with the given configuration.
