@@ -146,5 +146,5 @@ mavenPublishing {
 
   publishToMavenCentral(SonatypeHost.S01, automaticRelease = true)
 
-  //signAllPublications()
+  signAllPublications()
 }
