@@ -13,7 +13,7 @@ plugins {
 
 group = "xyz.mcxross.graphql.client"
 
-version = "0.1.0-beta07"
+version = "0.1.0-beta08"
 
 extra["isReleaseVersion"] = !version.toString().endsWith("-SNAPSHOT")
 
@@ -146,5 +146,5 @@ mavenPublishing {
 
   publishToMavenCentral(SonatypeHost.S01, automaticRelease = true)
 
-  signAllPublications()
+  //signAllPublications()
 }

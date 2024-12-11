@@ -12,7 +12,9 @@ dependencies {
   api(project(":graphql-multiplatform-client"))
   implementation(libs.kotlin.gradle.api)
   implementation(libs.ktor.client.apache)
+  implementation(libs.ktor.client.apache5)
   implementation(libs.ktor.client.content.negotiation)
+  implementation(libs.ktor.serialization.kotlinx.json)
   implementation(libs.jackson)
 
   implementation(libs.ktor.serialization.jackson) {
@@ -64,7 +66,7 @@ val generateDefaultVersion by
       defaultVersionFile.writeText(
         """
         package xyz.mcxross.graphql.plugin.gradle
-        internal const val DEFAULT_PLUGIN_VERSION = "0.1.0-beta07"
+        internal const val DEFAULT_PLUGIN_VERSION = "0.1.0-beta08"
     """
           .trimIndent()
       )

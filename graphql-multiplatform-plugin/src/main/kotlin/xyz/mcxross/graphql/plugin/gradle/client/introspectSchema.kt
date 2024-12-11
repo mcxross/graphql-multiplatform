@@ -20,7 +20,7 @@ import graphql.introspection.IntrospectionResultToSchema
 import graphql.schema.idl.SchemaPrinter
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache5.Apache5
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
@@ -30,9 +30,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.serialization.jackson.jackson
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import java.net.UnknownHostException
 import kotlinx.coroutines.runBlocking
 
@@ -134,15 +133,17 @@ fun introspectSchema(
   httpHeaders: Map<String, Any> = emptyMap(),
   connectTimeout: Long = 5_000,
   readTimeout: Long = 15_000,
-  streamResponse: Boolean = true,
+  streamResponse: Boolean = false,
 ): String =
-  HttpClient(engineFactory = Apache) {
-      install(HttpTimeout) {
-        connectTimeoutMillis = connectTimeout
-        requestTimeoutMillis = readTimeout
-      }
-      install(ContentNegotiation) { jackson(streamRequestBody = streamResponse) }
+  HttpClient(engineFactory = Apache5) {
+    install(HttpTimeout) {
+      connectTimeoutMillis = connectTimeout
+      requestTimeoutMillis = readTimeout
     }
+    install(ContentNegotiation) {
+      json()
+    }
+  }
     .use { client ->
       runBlocking {
         val introspectionResult =
