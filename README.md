@@ -7,9 +7,7 @@ It is built on top of [graphql-kotlin](https://github.com/ExpediaGroup/graphql-k
 Significant changes have been made to the original library to make it work on Kotlin Multiplatform. This included
 providing Ktor client support for all platforms and utilization of only multiplatform libraries.
 
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.23-B125EA?logo=kotlin)](https://kotlinlang.org)
-
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-v1.9.23-B125EA?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin Version](https://img.shields.io/badge/Kotlin-v2.0.21-B125EA?logo=kotlin)](https://kotlinlang.org)
 [![Maven Central](https://img.shields.io/maven-central/v/xyz.mcxross.graphql.client/graphql-multiplatform-client)](https://central.sonatype.com/artifact/xyz.mcxross.graphql.client/graphql-multiplatform-client)
 ![badge-android](http://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android)
 ![badge-ios](http://img.shields.io/badge/Platform-iOS-orange.svg?logo=apple)
